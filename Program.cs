@@ -1,24 +1,30 @@
 ﻿using System;
+using System.IO;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace CSGO_DataLogger
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Welcome to test console");
+      private static void Main(string[] args)
+      {
+          CreateHostBuilder(args).Build().Run();
+      }
 
-            WebCallManager.MakeWebCall("http://localhost:5000/webhook?action=bomb&token=kdjfngjidfsnglkjdfsngiusngu");
-
-            ListenManager.Start();
-
-            Console.WriteLine("Press any key to stop system");
-            Console.ReadKey();
-
-            ListenManager.Stop();
-
-            Console.WriteLine("Press any key to exit console");
-            Console.ReadKey();
-        }
+      private static IWebHostBuilder CreateHostBuilder(string[] args) {
+          var config = new ConfigurationBuilder()
+              .SetBasePath(Directory.GetCurrentDirectory())
+              .AddJsonFile("hostsettings.json", optional: true)
+              .AddCommandLine(args)
+              .AddEnvironmentVariables("CSGO")
+              .Build();
+          
+          return WebHost.CreateDefaultBuilder(args)
+              .UseConfiguration(config)
+              .UseStartup<Startup>();
+      }
     }
 }

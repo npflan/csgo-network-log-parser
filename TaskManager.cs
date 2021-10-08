@@ -1,89 +1,65 @@
 using System;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CSGO_DataLogger
 {
-    internal class TaskManager
+    public class TaskManager : BackgroundService
     {
-        private Task task;
-        protected CancellationTokenSource cancellationTokenSource;
-        protected CancellationToken cancelationToken;
-        private int _port;
+        private readonly ILogger<TaskManager> _logger;
+        private readonly IConfiguration _configuration;
 
-        public void Start(int port, bool overideShutdown = false)
+        public TaskManager(ILogger<TaskManager> logger, IConfiguration configuration)
         {
-            _port = port;
-            WriteLine("Task start is requestet");
+            _logger = logger;
+            _configuration = configuration.GetSection("CSGO");
+        }
 
-            if (IsRunning())
-            {
-                WriteLine("Task is allready running");
-                return;
-            }
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Task start is requested");
 
-
-            cancellationTokenSource = new CancellationTokenSource();
-            cancelationToken = cancellationTokenSource.Token;
-            task = new Task(() =>
-            {
-                TaskWork();
-            });
-            task.Start();
-
-            WriteLine("Task is startet");
+            return base.StartAsync(cancellationToken);
 
         }
 
-        public bool IsRunning() => (task != null && task.Status == TaskStatus.Running);
-
-        public void Stop(bool shutdown = false)
+        public override Task StopAsync(CancellationToken cancellationToken)
         {
-            WriteLine("Task stop is requestet");
+            _logger.LogInformation("Task stop is requested");
 
-            if (!IsRunning())
-            {
-                WriteLine("Task is not running");
-                return;
-            }
-
-            cancellationTokenSource.Cancel();
-            WriteLine("Task cancellation sendt");
+            return base.StopAsync(cancellationToken);
         }
 
-        private void TaskWork()
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Task.Run(async () =>
+            await Task.Run(async () =>
             {
-                using (var udpClient = new UdpClient(_port))
+                var port = int.Parse(_configuration["UDP_PORT"], NumberStyles.Integer);
+
+                using var udpClient = new UdpClient(port);
+                long counter = 0;
+                while (true)
                 {
-                    long counter = 0;
-                    while (true)
-                    {
-                        Console.Write($"\rAvalible:{udpClient.Available} Counter:{counter}                      ");
-                        //if (udpClient.Available > 0)
-                        //WriteLine($"Socket data avalible {udpClient.Available}");
-                        var receivedResults = await udpClient.ReceiveAsync();
-                        counter++;
-                        Task.Run(() => LogManager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(), Encoding.ASCII.GetString(receivedResults.Buffer)));
+                    _logger.LogInformation($"\rAvailable:{udpClient.Available} Counter:{counter}");
+                    //if (udpClient.Available > 0)
+                    //WriteLine($"Socket data available {udpClient.Available}");
+                    var receivedResults = await udpClient.ReceiveAsync().WithCancellation(stoppingToken);
+                    counter++;
+                    _logger.LogInformation("derp");
+                    Task.Run(
+                        () => LogManager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(),
+                            Encoding.ASCII.GetString(receivedResults.Buffer)), stoppingToken);
+                    _logger.LogInformation("derp2");
 
-                        //ClassLibrary_ParseMessage.Manager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(), Encoding.ASCII.GetString(receivedResults.Buffer));
-                    }
+                    //ClassLibrary_ParseMessage.Manager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(), Encoding.ASCII.GetString(receivedResults.Buffer));
                 }
-            }, cancelationToken);
-
-            //Keep the task alive and kill it the same time as the async
-            cancelationToken.WaitHandle.WaitOne();
-        }
-
-        private void WriteLine(string text)
-        {
-            Task.Run(() =>
-            {
-                Console.WriteLine(text);
-            });
+            }, stoppingToken);
         }
     }
 }

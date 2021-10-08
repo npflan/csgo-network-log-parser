@@ -6,7 +6,7 @@ namespace CSGO_DataLogger
     {
         public static void MakeWebCall(string uri)
         {
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             client.GetAsync(uri);
         }
     }
