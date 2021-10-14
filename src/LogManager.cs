@@ -34,6 +34,9 @@ namespace CSGO_DataLogger
 
             //Team\s"(?<Team>CT)"\striggered\s"(?<Event>SFUI_Notice_Bomb_Defused)"
             { "BombDefused", "Team\\s\"(?<Team>CT)\"\\striggered\\s\"(?<Event>SFUI_Notice_Bomb_Defused)\"" },
+
+            //World\striggered\s"(?<Type>Round_Start*)"
+            { "RoundStart", "World\\striggered\\s\"(?<Type>Round_Start*)\"" },
         };
 
         public async Task ParseLog(string server, string log, CancellationToken stoppingToken)
