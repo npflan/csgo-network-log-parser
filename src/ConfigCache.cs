@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
@@ -21,11 +22,17 @@ namespace CSGO_DataLogger
             {
                 Debug = tempDebug;
             }
-            foreach(string endpoint in configuration["CSGO_ApiEndpointsToCall"].Split(';'))
+            foreach(string endpoint in configuration["CSGO_ApiEndpointsToCall"].Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 ApiEndpointsToCall.Add(endpoint);
             }
-            foreach (string server in configuration["CSGO_ServersToReactTo"].Split(';'))
+
+            if (ApiEndpointsToCall.Count == 0)
+            {
+                throw new ArgumentException("Environment variable CSGO_ApiEndpointsToCall cannot be empty");
+            }
+            
+            foreach (string server in configuration["CSGO_ServersToReactTo"].Split(';', StringSplitOptions.RemoveEmptyEntries))
             {
                 ServersFilter.Add(server);
             }
