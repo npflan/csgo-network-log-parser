@@ -3,8 +3,7 @@ name: npflan-ci
 on:
   push:
     branches:
-      - 'master'
-      - 'change-startup-script'
+      - 'main'
 
 jobs:
   docker:
