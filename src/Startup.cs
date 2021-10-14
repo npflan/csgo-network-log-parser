@@ -21,7 +21,7 @@ public class Startup
         services.AddHostedService<TaskManager>();
         services.AddSingleton<LogManager>();
         services.AddSingleton(serviceProvider => new ConfigCache(serviceProvider.GetRequiredService<IConfiguration>()));
-        services.AddHttpClient<WebCallManager>();
+        services.AddHttpClient<WebCallManager>(opts => opts.Timeout = System.TimeSpan.FromSeconds(5));
         services.AddLogging();
 
         services.AddSwaggerGen();

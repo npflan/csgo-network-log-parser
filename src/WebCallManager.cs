@@ -29,7 +29,7 @@ namespace CSGO_DataLogger
                     _logger.LogInformation($"Now calling: {uri}");
                 }
 
-                await _httpClient.GetAsync(uri, stoppingToken);
+                Task.Run(() => _httpClient.GetAsync(uri, stoppingToken));
             }
         }
     }

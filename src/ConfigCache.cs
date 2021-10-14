@@ -31,10 +31,14 @@ namespace CSGO_DataLogger
             {
                 throw new ArgumentException("Environment variable CSGO_ApiEndpointsToCall cannot be empty");
             }
-            
-            foreach (string server in configuration["CSGO_ServersToReactTo"].Split(';', StringSplitOptions.RemoveEmptyEntries))
+
+            var ServersToReactTo = configuration["CSGO_ServersToReactTo"];
+            if (!string.IsNullOrWhiteSpace(ServersToReactTo))
             {
-                ServersFilter.Add(server);
+                foreach (string server in ServersToReactTo.Split(';', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    ServersFilter.Add(server);
+                }
             }
         }
     }

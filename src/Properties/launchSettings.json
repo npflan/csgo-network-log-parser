@@ -19,8 +19,8 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "CSGO_ServersToReactTo": "10.100.102.27",
-        "CSGO_ApiEndpointsToCall": "http://canarytokens.com/tags/513bkjckzbmmxri7qa11hauvl/post.jsp?Action=%%ServerAction%%&Token=123123123",
+        "CSGO_ServersToReactTo": "",
+        "CSGO_ApiEndpointsToCall": "http://127.0.0.1/webhook?action=%%ServerAction%%&Token=123;http://127.0.0.1/wow?action=%%ServerAction%%&Token=123",
         "CSGO_UDP_PORT": "9000",
         "CSGO_DebugMode": "true",
         "ASPNETCORE_ENVIRONMENT": "Development"
