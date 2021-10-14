@@ -20,6 +20,9 @@ public class Startup
         //services.AddSingleton(Configuration);
         services.AddControllers();
         services.AddHostedService<TaskManager>();
+        services.AddSingleton<LogManager>();
+        services.AddSingleton(services => new ConfigCache(services.GetRequiredService<IConfiguration>()));
+        services.AddHttpClient<WebCallManager>();
         services.AddLogging();
 
         services.AddSwaggerGen();

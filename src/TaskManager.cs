@@ -13,12 +13,14 @@ namespace CSGO_DataLogger
     public class TaskManager : BackgroundService
     {
         private readonly ILogger<TaskManager> _logger;
-        private readonly IConfiguration _configuration;
+        private readonly LogManager _logManager;
+        private readonly ConfigCache _configCache;
 
-        public TaskManager(ILogger<TaskManager> logger, IConfiguration configuration)
+        public TaskManager(ILogger<TaskManager> logger, LogManager logManager, ConfigCache configCache)
         {
             _logger = logger;
-            _configuration = configuration.GetSection("CSGO");
+            _logManager = logManager;
+            _configCache = configCache;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -40,24 +42,26 @@ namespace CSGO_DataLogger
         {
             await Task.Run(async () =>
             {
-                var port = int.Parse(_configuration["UDP_PORT"], NumberStyles.Integer);
-
-                using var udpClient = new UdpClient(port);
+                using var udpClient = new UdpClient(_configCache.ListnerPort);
                 long counter = 0;
                 while (true)
                 {
-                    _logger.LogInformation($"\rAvailable:{udpClient.Available} Counter:{counter}");
-                    //if (udpClient.Available > 0)
-                    //WriteLine($"Socket data available {udpClient.Available}");
-                    var receivedResults = await udpClient.ReceiveAsync().WithCancellation(stoppingToken);
-                    counter++;
-                    _logger.LogInformation("derp");
-                    Task.Run(
-                        () => LogManager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(),
-                            Encoding.ASCII.GetString(receivedResults.Buffer)), stoppingToken);
-                    _logger.LogInformation("derp2");
+                    if (_configCache.Debug)
+                    {
+                        _logger.LogInformation($"\rAvailable:{udpClient.Available} Counter:{counter}");
+                        counter++;
+                    }
 
-                    //ClassLibrary_ParseMessage.Manager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(), Encoding.ASCII.GetString(receivedResults.Buffer));
+                    //waiting for udp package
+                    var receivedResults = await udpClient.ReceiveAsync().WithCancellation(stoppingToken);
+                                     
+                    //Running logic
+                    //Task.Run(
+                    //    () => _logManager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(),
+                    //        Encoding.ASCII.GetString(receivedResults.Buffer), stoppingToken), stoppingToken);
+
+                    await _logManager.ParseLog(receivedResults.RemoteEndPoint.Address.ToString(),
+                            Encoding.ASCII.GetString(receivedResults.Buffer), stoppingToken);
                 }
             }, stoppingToken);
         }
