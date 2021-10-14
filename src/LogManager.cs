@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -21,7 +19,7 @@ namespace CSGO_DataLogger
             _configCache = configCache;
         }
 
-        private Dictionary<string, string> regexHash = new Dictionary<string, string>() {
+        private Dictionary<string, string> _regexHash = new Dictionary<string, string>() {
                        //"(?<PlayerName>.*)<[0-9]*><(?<PlayerID>STEAM_[0-9]*:[0-9]*:[0-9]*|BOT)><(?<Team>TERRORIST)>"\striggered\s"(?<EventID>Planted_The_Bomb*)"(\s\(value\s"(?<Value>.*)"\))?
             { "BombPlanted", "\"(?<PlayerName>.*)<[0-9]*><(?<PlayerID>STEAM_[0-9]*:[0-9]*:[0-9]*|BOT)><(?<Team>TERRORIST)>\"\\striggered\\s\"(?<EventID>Planted_The_Bomb*)\"(\\s\\(value\\s\"(?<Value>.*)\"\\))?" },
 
@@ -51,8 +49,8 @@ namespace CSGO_DataLogger
                 return;
             }
 
-            string ServerAction = "";
-            foreach (var regex in regexHash)
+            string serverAction = "";
+            foreach (var regex in _regexHash)
             {
                 var match = Regex.Match(log, regex.Value);
                 if (!match.Success)
@@ -60,10 +58,10 @@ namespace CSGO_DataLogger
                     continue;
                 }
 
-                ServerAction = regex.Key;
+                serverAction = regex.Key;
             }
 
-            if(string.IsNullOrWhiteSpace(ServerAction))
+            if(string.IsNullOrWhiteSpace(serverAction))
             {
                 if(_configCache.Debug)
                 {
@@ -72,7 +70,7 @@ namespace CSGO_DataLogger
                 return;
             }
 
-            await _webCallManager.MakeWebCall(ServerAction: ServerAction, stoppingToken);
+            await _webCallManager.MakeWebCall(serverAction: serverAction, stoppingToken);
         }
     }
 }

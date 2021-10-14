@@ -18,11 +18,11 @@ namespace CSGO_DataLogger
             _configCache = configCache;
         }
 
-        public async Task MakeWebCall(string ServerAction, CancellationToken stoppingToken)
+        public async Task MakeWebCall(string serverAction, CancellationToken stoppingToken)
         {
-            foreach (string ApiEndpoint in _configCache.ApiEndpointsToCall)
+            foreach (string apiEndpoint in _configCache.ApiEndpointsToCall)
             {
-                string uri = ApiEndpoint.Replace("%%ServerAction%%", ServerAction);
+                string uri = apiEndpoint.Replace("%%ServerAction%%", serverAction);
 
                 if(_configCache.Debug)
                 {

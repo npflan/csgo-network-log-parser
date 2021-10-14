@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 public class Startup
@@ -21,7 +20,7 @@ public class Startup
         services.AddControllers();
         services.AddHostedService<TaskManager>();
         services.AddSingleton<LogManager>();
-        services.AddSingleton(services => new ConfigCache(services.GetRequiredService<IConfiguration>()));
+        services.AddSingleton(serviceProvider => new ConfigCache(serviceProvider.GetRequiredService<IConfiguration>()));
         services.AddHttpClient<WebCallManager>();
         services.AddLogging();
 

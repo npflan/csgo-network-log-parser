@@ -1,9 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace CSGO_DataLogger
 {
@@ -14,25 +10,24 @@ namespace CSGO_DataLogger
         public List<string> ApiEndpointsToCall { get; private set; } = new List<string>();
         public List<string> ServersFilter { get; private set; } = new List<string>();
 
-        public ConfigCache(IConfiguration _configuration)
+        public ConfigCache(IConfiguration configuration)
         {
-            int tempListernetPort;
-            if(int.TryParse(_configuration["CSGO_UDP_PORT"], out tempListernetPort))
+            if(int.TryParse(configuration["CSGO_UDP_PORT"], out var tempListernetPort))
             {
                 ListnerPort = tempListernetPort;
             }
-            bool tempDebug;
-            if(bool.TryParse(_configuration["CSGO_DebugMode"], out tempDebug))
+
+            if(bool.TryParse(configuration["CSGO_DebugMode"], out var tempDebug))
             {
                 Debug = tempDebug;
             }
-            foreach(string endpoint in _configuration["CSGO_ApiEndpointsToCall"].Split(';'))
+            foreach(string endpoint in configuration["CSGO_ApiEndpointsToCall"].Split(';'))
             {
                 ApiEndpointsToCall.Add(endpoint);
             }
-            foreach (string Server in _configuration["CSGO_ServersToReactTo"].Split(';'))
+            foreach (string server in configuration["CSGO_ServersToReactTo"].Split(';'))
             {
-                ServersFilter.Add(Server);
+                ServersFilter.Add(server);
             }
         }
     }
