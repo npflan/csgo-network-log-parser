@@ -40,6 +40,9 @@ namespace CSGO_DataLogger
 
             //.*killed other "chicken<\d*>"
             { "ChickenKill", ".*killed other \"chicken<\\d*>\"" },
+
+            //.*Game Over: 
+            { "GameOver", ".*Game Over: " },
         };
 
         public async Task ParseLog(string server, string log, CancellationToken stoppingToken)
