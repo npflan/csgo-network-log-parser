@@ -20,7 +20,7 @@ namespace CSGO_DataLogger
         }
 
         private Dictionary<string, string> _regexHash = new Dictionary<string, string>() {
-                       //"(?<PlayerName>.*)<[0-9]*><(?<PlayerID>STEAM_[0-9]*:[0-9]*:[0-9]*|BOT)><(?<Team>TERRORIST)>"\striggered\s"(?<EventID>Planted_The_Bomb*)"(\s\(value\s"(?<Value>.*)"\))?
+            //"(?<PlayerName>.*)<[0-9]*><(?<PlayerID>STEAM_[0-9]*:[0-9]*:[0-9]*|BOT)><(?<Team>TERRORIST)>"\striggered\s"(?<EventID>Planted_The_Bomb*)"(\s\(value\s"(?<Value>.*)"\))?
             { "BombPlanted", "\"(?<PlayerName>.*)<[0-9]*><(?<PlayerID>STEAM_[0-9]*:[0-9]*:[0-9]*|BOT)><(?<Team>TERRORIST)>\"\\striggered\\s\"(?<EventID>Planted_The_Bomb*)\"(\\s\\(value\\s\"(?<Value>.*)\"\\))?" },
 
             //Team\s"(?<Team>TERRORIST)"\striggered\s"(?<Event>SFUI_Notice_Terrorists_Win)"
@@ -37,6 +37,9 @@ namespace CSGO_DataLogger
 
             //World\striggered\s"(?<Type>Round_Start*)"
             { "RoundStart", "World\\striggered\\s\"(?<Type>Round_Start*)\"" },
+
+            //.*killed other "chicken<\d*>"
+            { "ChickenKill", ".*killed other \"chicken<\\d*>\"" },
         };
 
         public async Task ParseLog(string server, string log, CancellationToken stoppingToken)
