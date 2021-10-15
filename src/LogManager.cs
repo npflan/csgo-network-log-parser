@@ -73,6 +73,8 @@ namespace CSGO_DataLogger
                 return;
             }
 
+            _logger.LogInformation($"Event cast: {serverAction}");
+
             await _webCallManager.MakeWebCall(serverAction: serverAction, stoppingToken);
         }
     }

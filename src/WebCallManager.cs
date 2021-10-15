@@ -24,11 +24,7 @@ namespace CSGO_DataLogger
             {
                 string uri = apiEndpoint.Replace("%%ServerAction%%", serverAction);
 
-                if(_configCache.Debug)
-                {
-                    _logger.LogInformation($"Now calling: {uri}");
-                }
-
+                _logger.LogInformation($"Calling: {uri}");
                 Task.Run(() => _httpClient.GetAsync(uri, stoppingToken));
             }
         }
