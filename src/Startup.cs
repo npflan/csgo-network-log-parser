@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 public class Startup
 {
@@ -20,7 +21,7 @@ public class Startup
         services.AddControllers();
         services.AddHostedService<TaskManager>();
         services.AddSingleton<LogManager>();
-        services.AddSingleton(serviceProvider => new ConfigCache(serviceProvider.GetRequiredService<IConfiguration>()));
+        services.AddSingleton(serviceProvider => new ConfigCache(serviceProvider.GetRequiredService<ILogger<ConfigCache>>(), serviceProvider.GetRequiredService<IConfiguration>()));
         services.AddHttpClient<WebCallManager>(opts => opts.Timeout = System.TimeSpan.FromSeconds(5));
         services.AddLogging();
 
